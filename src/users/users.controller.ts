@@ -7,6 +7,7 @@ import {
   Param,
   Query,
   Delete,
+  Session,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
