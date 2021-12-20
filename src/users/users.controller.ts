@@ -8,6 +8,7 @@ import {
   Query,
   Delete,
   Session,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
@@ -24,16 +25,35 @@ export class UsersController {
     private authService: AuthService,
   ) {}
 
+  @Get('/whoami')
+  async getMe(@Session() session: any) {
+    console.log(session);
+    if (!session.userId) {
+      throw new BadRequestException('not logged in');
+    }
+    const user = await this.userService.findOne(session.userId);
+    return user;
+  }
+
+  @Post('/signout')
+  signOut(@Session() session: any) {
+    session.userId = null;
+  }
+
   @Post('/signup')
-  createuser(@Body() body: CreateUserDto) {
+  async createuser(@Body() body: CreateUserDto, @Session() session: any) {
     const { email, password } = body;
-    return this.authService.signup(email, password);
+    const user = await this.authService.signup(email, password);
+    session.userId = user.id;
+    return user;
   }
 
   @Post('/signin')
-  signin(@Body() body: CreateUserDto) {
+  async signin(@Body() body: CreateUserDto, @Session() session: any) {
     const { email, password } = body;
-    return this.authService.signin(email, password);
+    const user = await this.authService.signin(email, password);
+    session.userId = user.id;
+    return user;
   }
 
   @Get('/:id')
