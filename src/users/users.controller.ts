@@ -9,6 +9,7 @@ import {
   Delete,
   Session,
   BadRequestException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
@@ -16,22 +17,29 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { AuthService } from './auth.service';
+import { currentUser } from './decorators/current-user.decorator';
+import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
 
 @Controller('auth')
 @Serialize(UserDto)
+@UseInterceptors(CurrentUserInterceptor)
 export class UsersController {
   constructor(
     private userService: UsersService,
     private authService: AuthService,
   ) {}
 
+  // @Get('/whoami')
+  // async getMe(@Session() session: any) {
+  //   console.log(session);
+  //   if (!session.userId) {
+  //     throw new BadRequestException('not logged in');
+  //   }
+  //   const user = await this.userService.findOne(session.userId);
+  //   return user;
+  // }
   @Get('/whoami')
-  async getMe(@Session() session: any) {
-    console.log(session);
-    if (!session.userId) {
-      throw new BadRequestException('not logged in');
-    }
-    const user = await this.userService.findOne(session.userId);
+  whoAmI(@currentUser() user: any) {
     return user;
   }
 
