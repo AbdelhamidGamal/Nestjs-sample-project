@@ -5,11 +5,7 @@ import {
   Injectable,
   UseInterceptors,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { UsersService } from '../users.service';
-
-// export const getCurrentUser = () =>
-//   UseInterceptors(new CurrentUserInterceptor());
 
 @Injectable()
 export class CurrentUserInterceptor implements NestInterceptor {

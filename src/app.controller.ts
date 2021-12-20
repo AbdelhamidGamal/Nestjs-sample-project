@@ -1,12 +1,17 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
+import { Serialize } from './interceptors/serialize.interceptor';
+import { currentUser } from './users/decorators/current-user.decorator';
+import { UserDto } from './users/dtos/user.dto';
+import { User } from './users/user.entity';
 
+@Serialize(UserDto)
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  getHello(@currentUser() user: any): string {
+    return user;
   }
 }

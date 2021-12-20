@@ -8,8 +8,6 @@ import {
   Query,
   Delete,
   Session,
-  BadRequestException,
-  UseInterceptors,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
@@ -18,11 +16,10 @@ import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 import { AuthService } from './auth.service';
 import { currentUser } from './decorators/current-user.decorator';
-import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
+import { User } from './user.entity';
 
 @Controller('auth')
 @Serialize(UserDto)
-@UseInterceptors(CurrentUserInterceptor)
 export class UsersController {
   constructor(
     private userService: UsersService,
@@ -39,7 +36,7 @@ export class UsersController {
   //   return user;
   // }
   @Get('/whoami')
-  whoAmI(@currentUser() user: any) {
+  whoAmI(@currentUser() user: User) {
     return user;
   }
 
