@@ -7,12 +7,28 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
 import { CreateReportDto } from './dtos/create-report.dto';
+import { GetEstimateDto } from './dtos/get-estimate.dto';
 import { Report } from './report.entity';
 
 @Injectable()
 export class ReportsService {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   constructor(@InjectRepository(Report) private repo: Repository<Report>) {}
+
+  createEstimate({ make, model, lng, lat, year, mileage }: GetEstimateDto) {
+    return this.repo
+      .createQueryBuilder()
+      .select('AVG(price)', 'price')
+      .where('make = :make', { make })
+      .andWhere('model = :model', { model })
+      .andWhere('lng - :lng BETWEEN -5 and 5', { lng })
+      .andWhere('lat - :lat BETWEEN -5 and 5', { lat })
+      .andWhere('year - :year BETWEEN -3 and 3', { year })
+      .orderBy('ABS(mileage - :mileage)', 'DESC')
+      .setParameters({ mileage })
+      .limit(3)
+      .getRawOne();
+  }
 
   create(reportDto: CreateReportDto, user: User) {
     const report = this.repo.create({ ...reportDto, user });
